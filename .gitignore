@@ -1,5 +1,6 @@
 # Binaries for programs and plugins
 pmz
+bin/
 *.exe
 *.exe~
 *.dll

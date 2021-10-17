@@ -16,8 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-    "os"
-	"os/exec"
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
+	"github.com/gsilvapt/pmz/internal/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,36 +32,60 @@ import (
 // TODO Should allow searching by day, month and/or year (with the right flags)
 // TODO Allow passing flags to grep directly for custom searches
 var searchCmd = &cobra.Command{
-	Use:   "search",
+	Use:   "search <term>",
 	Short: "Searches for given keywords.",
 	Long: `Searches for keywords in all Zettelkasten's notes and files. It integrates Grep and returns its output to 
     the main screen.`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ztldir := viper.GetString("ztldir")
-		term, _ := cmd.Flags().GetString("term")
+		editor := viper.GetString("editor")
+		term := args[0]
 
-        grep := exec.Command("grep", "-rH", "--exclude-dir", ".git", ztldir, "-e", term)
-        grep.Stdin = os.Stdin
-        grep.Stdout = os.Stdout
-        grep.Stderr = os.Stderr
-        grep.Run()
+		// TODO Must make use of the outcome from WalkNoteDir and thus this recursive call should do something.
+		var r []*utils.Result = utils.WalkNoteDir(term, ztldir)
+		for i, f := range r {
+			fmt.Printf("%d | %s: %s \n", i, f.Path, f.Context)
+		}
+
+		// Proceed with next command
+		fmt.Println("Choose follow-up action with the found files: `open <id>` to open with your editor, `more <id>`" +
+			" to print the file contents.")
+		switch cmd, idx := nextCommand(); cmd {
+		case "open":
+			f := r[idx]
+			OpenFile(f.Path, editor)
+		case "more":
+			f := r[idx]
+			readFile(f.Path)
+		default:
+			return
+		}
 	},
 }
 
+func nextCommand() (string, int) {
+	buffer := bufio.NewReader(os.Stdin)
+	line, err := buffer.ReadString('\n')
+	PanicIfError(err, "failed reading input from screen")
+
+	command := strings.Fields(line)
+	idx, err := strconv.Atoi(command[1])
+	PanicIfError(err, "index provided is not a valid number")
+
+	return command[0], idx
+}
+
+func readFile(fp string) {
+	dat, err := os.ReadFile(fp)
+	PanicIfError(err, "failed opening specified file")
+	fmt.Println(string(dat))
+}
+
 func init() {
-	rootCmd.AddCommand(searchCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// searchCmd.PersistentFlags().String("foo", "", "A help for foo")
-	searchCmd.PersistentFlags().String("term", "", "The search term")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// searchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	searchCmd.Flags().IntP("day", "d", 0, "Look for messages created at day D - accepts from 1 to 31.")
 	searchCmd.Flags().IntP("month", "m", 0, "Look for messages created at month M - accepts from 1 to 12.")
 	searchCmd.Flags().IntP("year", "y", 0, "Look for messages created at year Y - accepts all positives numbers.")
+
+	rootCmd.AddCommand(searchCmd)
 }

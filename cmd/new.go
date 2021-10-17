@@ -18,7 +18,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"text/template"
 	"time"
 
@@ -52,11 +51,7 @@ You will see the new directory and file created in the configured ZTLDIR.
 
 		writeToNewNote(f, title)
 		if toOpen {
-			editor := exec.Command(editor, f.Name())
-			editor.Stdin = os.Stdin
-			editor.Stdout = os.Stdout
-			editor.Stderr = os.Stderr
-			editor.Run()
+			OpenFile(f.Name(), editor)
 		}
 	},
 }
@@ -68,7 +63,7 @@ func createZettelEntry(ztldir, dirname string) *os.File {
 	newZtlDir := fmt.Sprintf("%s/%s", ztldir, dirname)
 
 	if err := os.Mkdir(newZtlDir, os.ModePerm); err != nil {
-        PanicIfError(err, "Failed to create directory.")
+		PanicIfError(err, "Failed to create directory.")
 	}
 
 	f, err := os.Create(fmt.Sprintf("%s/%s", newZtlDir, FILENAME))
