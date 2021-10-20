@@ -48,6 +48,10 @@ var searchCmd = &cobra.Command{
 			fmt.Printf("%d | %s: %s \n", i, f.Path, f.Context)
 		}
 
+		if len(r) < 1 {
+			return
+		}
+
 		// Proceed with next command
 		fmt.Println("Choose follow-up action with the found files: `open <id>` to open with your editor, `more <id>`" +
 			" to print the file contents.")
