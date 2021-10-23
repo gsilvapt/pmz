@@ -42,10 +42,10 @@ func WalkNoteDir(searchTerm string, path string) []*Result {
 		for i := 0; i <= 1; i++ {
 			line, err := rd.ReadString('\n')
 			if err != nil {
-				if err != io.EOF {
-					break
+				if err == io.EOF {
+					continue
 				}
-				log.Fatal("failed reading line from file failed")
+				log.Fatalf("failed reading first line from file: %s", err)
 			}
 
 			if strings.Contains(strings.ToLower(line), strings.ToLower(searchTerm)) {
