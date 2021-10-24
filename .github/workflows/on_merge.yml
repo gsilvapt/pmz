@@ -1,0 +1,55 @@
+name: PMZ CI Pipeline
+on: pull_request
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: [ ubuntu-latest ]
+        steps:
+            - name: Install Go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: 1.17.x
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Gofmt
+              run: |
+                  if [[ $(gofmt -l .) ]]; then
+                      echo "Code is not formatted using fmt. Please use gofmt and push those changes to the remote."
+                      exit 1
+                  fi
+                  exit 0
+    test:
+        needs: lint
+        runs-on: [ ubuntu-latest ]
+        steps:
+            - name: Install Go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: 1.17.x
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Go test
+              run: |
+                  if [[ $(go test -v ./...) -ne 0 ]]; then
+                      echo "Failed while running the test suite. All tests **must** pass."
+                      exit 1
+                  fi
+                  exit 0
+    build:
+        needs: test
+        runs-on: [ ubuntu-latest ]
+        steps:
+            - name: Install Go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: 1.17.x
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Go test
+              run: |
+                  if [[ $(go build -o bin/pmz) -ne 0 ]]; then
+                      echo "Could not build project. Project must compile to proceed."
+                      exit 1
+                  fi
+                  exit 0
