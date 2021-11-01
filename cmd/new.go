@@ -44,7 +44,7 @@ You will see the new directory and file created in the configured ZTLDIR.
 		toOpen, _ := cmd.Flags().GetBool("open")
 
 		ts := time.Now()
-		formattedTs := fmt.Sprintf("%d%d%d%d%d", ts.Year(), ts.Month(), ts.Day(), ts.Hour(), ts.Minute())
+		formattedTs := fmt.Sprintf("%d%d%d%d%d%d", ts.Year(), ts.Month(), ts.Day(), ts.Hour(), ts.Minute(), ts.Second())
 
 		f := createZettelEntry(ztldir, formattedTs)
 		defer f.Close()
