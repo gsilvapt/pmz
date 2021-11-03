@@ -36,10 +36,13 @@ For example:
 
 <pmz new> will create a new note (README.md) in a directory with the current timestamp and opens it up in your $EDITOR.
 You will see the new directory and file created in the configured ZTLDIR.
+
+If a template is specified and you use the --title flag, it will try to insert the title in that template.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		ztldir := viper.GetString("ztldir")
 		editor := viper.GetString("editor")
+		tmpl_path := viper.GetString("notetemplate")
 		title, _ := cmd.Flags().GetString("title")
 		toOpen, _ := cmd.Flags().GetBool("open")
 
@@ -49,7 +52,10 @@ You will see the new directory and file created in the configured ZTLDIR.
 		f := createZettelEntry(ztldir, formattedTs)
 		defer f.Close()
 
-		writeToNewNote(f, title)
+		if tmpl_path != "" {
+			writeTmplToNote(f, title, tmpl_path)
+		}
+
 		if toOpen {
 			OpenFile(f.Name(), editor)
 		}
@@ -74,22 +80,23 @@ func createZettelEntry(ztldir, dirname string) *os.File {
 	return f
 }
 
-// writeToNewNote writes the template into the new file. Handles errors gracefully.
-func writeToNewNote(f *os.File, title string) {
+// writeTmplToNote writes the template into the new file. Handles errors gracefully.
+func writeTmplToNote(f *os.File, title, tmplPath string) {
 	tmplData := struct {
 		Title string
 	}{
 		Title: title,
 	}
 
-	tmpl, err := template.ParseFiles("templates/new_note")
+	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
-		Logger.Error("failed to write template to new note, but it should exist for you.")
+		Logger.Error("template file might not exist; not writing to new note.")
 	}
 
 	if err := tmpl.Execute(f, tmplData); err != nil {
-		Logger.Info("Failed to write template to new note, but it should exist for you.")
+		Logger.Info("Failed to write template to new note, but the note should exist.")
 	}
+	return
 }
 
 func init() {

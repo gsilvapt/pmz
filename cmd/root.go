@@ -21,18 +21,18 @@ import (
 
 	"github.com/gsilvapt/pmz/internal/logs"
 	"github.com/spf13/cobra"
-
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile   string
-	ztldir    string
-	editor    string
-	gitrepo   string
-	gituser   string
-	repotoken string
-	Logger    *logs.Log
+	cfgFile      string
+	ztldir       string
+	notetemplate string
+	editor       string
+	gitrepo      string
+	gituser      string
+	repotoken    string
+	Logger       *logs.Log
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -40,7 +40,11 @@ var rootCmd = &cobra.Command{
 	Use:   "pmz",
 	Short: "Poor Man Zettelkasten CLI",
 	Long: `This is a simple CLI application to help users maintain a Zettelkasten.
-It provides methods to add, search and save your changes into a git repository.`,
+It provides methods to add, search and save your changes into a git repository.
+
+Full documentation can be found in the project's README: https://github.com/gsilvapt/pmz
+`,
+	Version: "0.1",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -61,18 +65,18 @@ func init() {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pmz.yaml)")
 	rootCmd.PersistentFlags().StringVar(&ztldir, "ztldir", "", "Zettelkasten main directory loaded from config.")
+	rootCmd.PersistentFlags().StringVar(&notetemplate, "notetemplate", "", "Path to template of a new note. Ensure it contains the variables specified in the documentation.")
 	rootCmd.PersistentFlags().StringVar(&editor, "editor", "", "Editor PATH loaded from config file.")
 	rootCmd.PersistentFlags().StringVar(&gitrepo, "gitrepo", "", "Zettelkasten git repository loaded from config.")
 	rootCmd.PersistentFlags().StringVar(&gituser, "gituser", "", "Git username loaded from config.")
 	rootCmd.PersistentFlags().StringVar(&repotoken, "repotoken", "", "Zettelkasten git repository token with **read** and **write** access")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.InitDefaultVersionFlag()
 
 	// Viper binding for global reach
 	viper.BindPFlag("ztldir", rootCmd.PersistentFlags().Lookup("ztldir"))
 	viper.BindPFlag("editor", rootCmd.PersistentFlags().Lookup("editor"))
+	viper.BindPFlag("notetemplate", rootCmd.PersistentFlags().Lookup("notetemplate"))
 	viper.BindPFlag("gitrepo", rootCmd.PersistentFlags().Lookup("gitrepo"))
 	viper.BindPFlag("gituser", rootCmd.PersistentFlags().Lookup("gituser"))
 	viper.BindPFlag("repotoken", rootCmd.PersistentFlags().Lookup("repotoken"))

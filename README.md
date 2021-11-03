@@ -22,6 +22,16 @@ you will need to update to your own use case. Make a copy in your home directory
 * `pmz search` allows searching for keywords in notes' titles. Afterwards, user can either open or request more to 
 display file contents.
 
+## Templates  
+The program supports a custom template for a new note. It can have the format you want, as long as it contains the 
+`{{.Title}}` variable. If in doubt of what that looks like, please check [the template that exists](./templates/new_note) 
+in this repository. 
+
+You are free to use it too, either by cloning this project or by copying it manually to file in your system. 
+
+To use your custom template, please provide its full path in the configuration file. Check the 
+[sample configuration file](./.pmz.yaml.example) for an example.
+
 
 # CONTRIBUTING  
 When I started building this, I wanted a way to keep a [Zettelkasten](https://zettelkasten.de/) simple and bloat free - 
