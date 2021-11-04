@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gsilvapt/pmz/internal/logs"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -31,6 +32,7 @@ var (
 	gitrepo   string
 	gituser   string
 	repotoken string
+	Logger    *logs.Log
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -51,6 +53,7 @@ func Execute() {
 }
 
 func init() {
+	Logger = logs.InitLogger()
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -94,6 +97,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Fprintln(os.Stderr, "Failed reading config file:", viper.ConfigFileUsed())
+		Logger.Error(fmt.Sprintf("Failed reading config file: %s", viper.ConfigFileUsed()))
 	}
 }

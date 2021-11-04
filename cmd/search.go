@@ -71,19 +71,25 @@ var searchCmd = &cobra.Command{
 func nextCommand() (string, int) {
 	buffer := bufio.NewReader(os.Stdin)
 	line, err := buffer.ReadString('\n')
-	PanicIfError(err, "failed reading input from screen")
+	if err != nil {
+		Logger.Error(fmt.Sprintf("failed reading input from screen: %s", err))
+	}
 
 	command := strings.Fields(line)
 	idx, err := strconv.Atoi(command[1])
-	PanicIfError(err, "index provided is not a valid number")
+	if err != nil {
+		Logger.Error(fmt.Sprintf("failed reading input from screen: %s", err))
+	}
 
 	return command[0], idx
 }
 
 func readFile(fp string) {
 	dat, err := os.ReadFile(fp)
-	PanicIfError(err, "failed opening specified file")
-	fmt.Println(string(dat))
+	if err != nil {
+		Logger.Error(fmt.Sprintf("failed opening specified file: %s", err))
+	}
+	Logger.Info(string(dat))
 }
 
 func init() {
