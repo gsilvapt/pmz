@@ -63,12 +63,12 @@ func createZettelEntry(ztldir, dirname string) *os.File {
 	newZtlDir := fmt.Sprintf("%s/%s", ztldir, dirname)
 
 	if err := os.Mkdir(newZtlDir, os.ModePerm); err != nil {
-		PanicIfError(err, "Failed to create directory.")
+		Logger.Error(fmt.Sprintf("failed to create directory: %s", err))
 	}
 
 	f, err := os.Create(fmt.Sprintf("%s/%s", newZtlDir, FILENAME))
 	if err != nil {
-		PanicIfError(err, "Failed to create the file in new dir.")
+		Logger.Error(fmt.Sprintf("failed to create the file in new dir: %s", err))
 	}
 
 	return f
@@ -84,11 +84,11 @@ func writeToNewNote(f *os.File, title string) {
 
 	tmpl, err := template.ParseFiles("templates/new_note")
 	if err != nil {
-		fmt.Println("Failed to write template to new note, but it should exist for you.")
+		Logger.Error("failed to write template to new note, but it should exist for you.")
 	}
 
 	if err := tmpl.Execute(f, tmplData); err != nil {
-		fmt.Println("Failed to write template to new note, but it should exist for you.")
+		Logger.Info("Failed to write template to new note, but it should exist for you.")
 	}
 }
 
