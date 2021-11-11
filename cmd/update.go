@@ -24,6 +24,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var upToDateErrorMessage string = "already up-to-date"
+
 // updateCmd represents the update command
 // TODO pull changes from git repository (if it is configured in the file).
 var updateCmd = &cobra.Command{
@@ -34,27 +36,39 @@ var updateCmd = &cobra.Command{
 
     This command should work **as long as** the provided token has read access to that repository and that 
     repository already exists remotely.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		ztlrepo := viper.GetString("ztlrepo")
-		gituser := viper.GetString("gituser")
-		gittoken := viper.GetString("repotoken")
+	Run: runUpdateCmd,
+}
 
-		r, err := git.PlainOpen(ztlrepo)
-		PanicIfError(err, "Failed opening the git repository")
+func runUpdateCmd(cmd *cobra.Command, args []string) {
+	ztlrepo := viper.GetString("ztlrepo")
+	gituser := viper.GetString("gituser")
+	gittoken := viper.GetString("repotoken")
 
-		wt, err := r.Worktree()
-		PanicIfError(err, "Failed getting worktree")
+	r, err := git.PlainOpen(ztlrepo)
+	if err != nil {
+		Logger.Error(fmt.Sprintf("failed opening the git repository: %s", err))
+	}
 
-		err = wt.Pull(&git.PullOptions{
-			RemoteName: "origin",
-			Auth: &http.BasicAuth{
-				Username: gituser,
-				Password: gittoken,
-			},
-		})
-		PanicIfError(err, fmt.Sprintf("Failed pulling from remote repository: \n %s", err))
-		fmt.Println("Successfully updated your local Zettelkasten.")
-	},
+	wt, err := r.Worktree()
+	if err != nil {
+		Logger.Error(fmt.Sprintf("failed opening the repository tree: %s", err))
+	}
+
+	switch err := wt.Pull(&git.PullOptions{
+		RemoteName: "origin",
+		Auth: &http.BasicAuth{
+			Username: gituser,
+			Password: gittoken,
+		},
+	}); err != nil {
+	case err.Error() == upToDateErrorMessage:
+		Logger.Info("repository already up to date")
+		return
+	default:
+		Logger.Error(fmt.Sprintf("failed pulling from remote repository: \n %s", err))
+	}
+
+	Logger.Info("Successfully updated your local Zettelkasten.")
 }
 
 func init() {

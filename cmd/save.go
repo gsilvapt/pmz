@@ -31,10 +31,10 @@ var saveCmd = &cobra.Command{
 	Long: `Users can configure a remote git repository that allows them to "save" their notes onto the web.
     Whether that is BitBucket, GitHub, GitLab or anything else, it should work the same **as long as** the provided 
     token has write access to that repository and that repository already exists.`,
-	Run: executeCommand,
+	Run: runSaveCommand,
 }
 
-func executeCommand(cmd *cobra.Command, args []string) {
+func runSaveCommand(cmd *cobra.Command, args []string) {
 	ztlrepo := viper.GetString("ztlrepo")
 	gituser := viper.GetString("gituser")
 	gittoken := viper.GetString("repotoken")
