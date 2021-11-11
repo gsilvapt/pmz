@@ -15,12 +15,15 @@ there are helpers for all commands.
 
 
 # Usage 
-To maximize productivity, this project is configuration based, hence you can find a `.pmz.yaml.example` file with variables 
-you will need to update to your own use case. Make a copy in your home directory and remove the `.example` suffix.
+To maximize productivity, this project is configuration based, hence you can find a `.pmz.yaml.example` file with 
+variables you will need to update to your own use case. Make a copy in your home directory and remove the `.example` 
+suffix.
 
 * `pmz new` adds a new note - it creates a directory with the current timestamp and a `README.md` file inside.
 * `pmz search` allows searching for keywords in notes' titles. Afterwards, user can either open or request more to 
 display file contents.
+* `pmz update` pulls changes from the remote repository into your local copy. **Only selected branch is supported**.
+* `pmz save` pushes the changes to the remote repository. **Only selected branch is supported.**
 
 ## Templates  
 The program supports a custom template for a new note. It can have the format you want, as long as it contains the 
