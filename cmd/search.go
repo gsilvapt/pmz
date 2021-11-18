@@ -44,12 +44,13 @@ var searchCmd = &cobra.Command{
 
 		// TODO Must make use of the outcome from WalkNoteDir and thus this recursive call should do something.
 		var r []*utils.Result = utils.WalkNoteDir(term, ztldir)
-		for i, f := range r {
-			fmt.Printf("%d | %s: %s \n", i, f.Path, f.Context)
+		if len(r) < 1 {
+			fmt.Println("No results found for query. Exiting...")
+			return
 		}
 
-		if len(r) < 1 {
-			return
+		for i, f := range r {
+			fmt.Printf("%d | %s: %s", i, f.Path, f.Context)
 		}
 
 		// Proceed with next command
