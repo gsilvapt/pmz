@@ -47,7 +47,9 @@ If a template is specified and you use the --title flag, it will try to insert t
 		toOpen, _ := cmd.Flags().GetBool("open")
 
 		ts := time.Now()
-		formattedTs := fmt.Sprintf("%d%d%d%d%d%d", ts.Year(), ts.Month(), ts.Day(), ts.Hour(), ts.Minute(), ts.Second())
+		formattedTs := fmt.Sprintf("%d%s%s%s%s%s", ts.Year(), ts.Format("01"), ts.Format("02"),
+			ts.Format("03"), ts.Format("04"), ts.Format("05"),
+		)
 
 		f := createZettelEntry(ztldir, formattedTs)
 		defer f.Close()
