@@ -53,35 +53,54 @@ var searchCmd = &cobra.Command{
 		}
 
 		// Proceed with next command
-		fmt.Println("Choose follow-up action with the found files: `open <id>` to open with your editor, `more <id>`" +
-			" to print the file contents.")
-		switch cmd, idx := nextCommand(); cmd {
-		case "open":
-			f := r[idx]
-			OpenFile(f.Path, editor)
-		case "more":
-			f := r[idx]
-			readFile(f.Path)
-		default:
-			return
+	Interaction:
+		for {
+			fmt.Println("Choose the next action with the found files: `open <id>` to open with your editor, " +
+				"`more <id>` to print the file contents, or <q> to quit.")
+
+			switch cmd, idx := nextCommand(); cmd {
+			case "open":
+				f := r[idx]
+				OpenFile(f.Path, editor)
+			case "more":
+				f := r[idx]
+				readFile(f.Path)
+			case "q":
+				break Interaction
+			default:
+				fmt.Println("Unrecognized option: `open <id>` to open with your editor, `more <id>`" +
+					" to print file's contents or <q>  to quit.")
+			}
 		}
 	},
 }
 
 func nextCommand() (string, int) {
+	var command string = ""
+	var idx int = 0
+
 	buffer := bufio.NewReader(os.Stdin)
 	line, err := buffer.ReadString('\n')
 	if err != nil {
 		Logger.Error(fmt.Sprintf("failed reading input from screen: %s", err))
 	}
 
-	command := strings.Fields(line)
-	idx, err := strconv.Atoi(command[1])
-	if err != nil {
-		Logger.Error(fmt.Sprintf("failed reading input from screen: %s", err))
+	switch inputs := strings.Fields(line); len(inputs) {
+	case 1:
+		command = inputs[0]
+	case 2:
+		idx, err = strconv.Atoi(inputs[1])
+		if err != nil {
+			Logger.Error(fmt.Sprintf("failed to detect number - did you provide one? %s", err))
+		}
+
+		command = inputs[0]
+	case 0:
+		command = ""
+		idx = 0
 	}
 
-	return command[0], idx
+	return command, idx
 }
 
 func readFile(fp string) {
@@ -89,7 +108,7 @@ func readFile(fp string) {
 	if err != nil {
 		Logger.Error(fmt.Sprintf("failed opening specified file: %s", err))
 	}
-	Logger.Info(string(dat))
+	fmt.Println(string(dat))
 }
 
 func init() {
