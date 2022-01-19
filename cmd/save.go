@@ -39,6 +39,8 @@ func runSaveCommand(cmd *cobra.Command, args []string) {
 	gituser := viper.GetString("gituser")
 	gittoken := viper.GetString("repotoken")
 
+	cmsg, _ := cmd.Flags().GetString("message")
+
 	r, err := git.PlainOpen(ztlrepo)
 	if err != nil {
 		Logger.Error(fmt.Sprintf("failed opening the git repository: %s", err))
@@ -60,7 +62,7 @@ func runSaveCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	_, err = wt.Commit("updating your zettelkasten", &git.CommitOptions{})
+	_, err = wt.Commit(cmsg, &git.CommitOptions{})
 	if err != nil {
 		Logger.Error(fmt.Sprintf("failed committing changes: \n %s", err))
 	}
@@ -80,4 +82,7 @@ func runSaveCommand(cmd *cobra.Command, args []string) {
 
 func init() {
 	rootCmd.AddCommand(saveCmd)
+
+	saveCmd.Flags().StringP("message", "m", "updating your zettelkasten",
+		"Provide a specific message if you prefer over the default one")
 }
