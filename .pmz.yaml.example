@@ -1,5 +1,5 @@
 # Your editor path. Example: /usr/bin/vim
-editor: ''#/usr/bin/vim
+editor: ''
 # Your zettel directory - it must exist! Example: /home/<user>/zettel
 ztldir: ''
 # If you have a note template you would like to use. Example: /home/<user>/zettel_tmpl.txt
