@@ -25,8 +25,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const FILENAME string = "README.md"
-
 // newCmd represents the new command
 var newCmd = &cobra.Command{
 	Use:   "new",
@@ -51,7 +49,7 @@ If a template is specified and you use the --title flag, it will try to insert t
 			ts.Format("03"), ts.Format("04"), ts.Format("05"),
 		)
 
-		f := createZettelEntry(ztldir, formattedTs)
+		f := createFile(ztldir, formattedTs, title)
 		defer f.Close()
 
 		if tmpl_path != "" {
@@ -64,17 +62,21 @@ If a template is specified and you use the --title flag, it will try to insert t
 	},
 }
 
-// createZettelEntry attempts to create the directory for the new note, as well as a README.md file in that same directory.
+// createFile attempts to create the directory for the new note, as well as a README.md file in that same directory.
 // Panics if it any of it fails as this is a key functionality of the command.
 // Returns file pointer. Caller should use `defer` to close this file pionter, or manually close it when not needed.
-func createZettelEntry(ztldir, dirname string) *os.File {
+func createFile(ztldir, dirname, title string) *os.File {
 	newZtlDir := fmt.Sprintf("%s/%s", ztldir, dirname)
-
 	if err := os.Mkdir(newZtlDir, os.ModePerm); err != nil {
 		Logger.Error(fmt.Sprintf("failed to create directory: %s", err))
 	}
 
-	f, err := os.Create(fmt.Sprintf("%s/%s", newZtlDir, FILENAME))
+	var filename string = "README.md"
+	if title != "" {
+		filename = fmt.Sprintf("%s.md", title)
+	}
+
+	f, err := os.Create(fmt.Sprintf("%s/%s", newZtlDir, filename))
 	if err != nil {
 		Logger.Error(fmt.Sprintf("failed to create the file in new dir: %s", err))
 	}
