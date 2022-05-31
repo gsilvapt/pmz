@@ -31,7 +31,7 @@ jobs:
               uses: actions/checkout@v2
             - name: Go test
               run: |
-                  if [[ $(go test -v ./...) -ne 0 ]]; then
+                  if [[ $(go test -v -race ./...) -ne 0 ]]; then
                       echo "Failed while running the test suite. All tests **must** pass."
                       exit 1
                   fi
