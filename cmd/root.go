@@ -44,7 +44,7 @@ It provides methods to add, search and save your changes into a git repository.
 
 Full documentation can be found in the project's README: https://github.com/gsilvapt/pmz
 `,
-	Version: "0.4",
+	Version: "0.5",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
