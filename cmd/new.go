@@ -10,7 +10,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// newCmd represents the new command
+func PrepNewCmdFlags(newCmd *cobra.Command) {
+	newCmd.Flags().String("title", "", "Provide a title for the new note")
+	newCmd.Flags().Bool("open", true, "To open or not the new note with the configured $EDITOR. Default is true.")
+}
+
+// newCmd represents the new command for pmz
 var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "A new note.",
@@ -22,29 +27,32 @@ You will see the new directory and file created in the configured ZTLDIR.
 
 If a template is specified and you use the --title flag, it will try to insert the title in that template.
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		ztldir := viper.GetString("ztldir")
-		editor := viper.GetString("editor")
-		tmpl_path := viper.GetString("notetemplate")
-		title, _ := cmd.Flags().GetString("title")
-		toOpen, _ := cmd.Flags().GetBool("open")
+	Run: newCmdRunFunc,
+}
 
-		ts := time.Now()
-		formattedTs := fmt.Sprintf("%d%s%s%s%s%s", ts.Year(), ts.Format("01"), ts.Format("02"),
-			ts.Format("03"), ts.Format("04"), ts.Format("05"),
-		)
+// newCmdRunFunc is an isolated func to facilitate writing unit tests to it.
+func newCmdRunFunc(cmd *cobra.Command, args []string) {
+	ztldir := viper.GetString("ztldir")
+	editor := viper.GetString("editor")
+	tmpl_path := viper.GetString("notetemplate")
+	title, _ := cmd.Flags().GetString("title")
+	toOpen, _ := cmd.Flags().GetBool("open")
 
-		f := createFile(ztldir, formattedTs, title)
-		defer f.Close()
+	ts := time.Now()
+	formattedTs := fmt.Sprintf("%d%s%s%s%s%s", ts.Year(), ts.Format("01"), ts.Format("02"),
+		ts.Format("03"), ts.Format("04"), ts.Format("05"),
+	)
 
-		if tmpl_path != "" {
-			writeTmplToNote(f, title, tmpl_path)
-		}
+	f := createFile(ztldir, formattedTs, title)
+	defer f.Close()
 
-		if toOpen {
-			OpenFile(f.Name(), editor)
-		}
-	},
+	if tmpl_path != "" {
+		writeTmplToNote(f, title, tmpl_path)
+	}
+
+	if toOpen {
+		OpenFile(f.Name(), editor)
+	}
 }
 
 // createFile attempts to create the directory for the new note, as well as a README.md file in that same directory.
@@ -90,7 +98,5 @@ func writeTmplToNote(f *os.File, title, tmplPath string) {
 
 func init() {
 	rootCmd.AddCommand(newCmd)
-
-	newCmd.Flags().String("title", "", "Provide a title for the new note")
-	newCmd.Flags().Bool("open", true, "To open or not the new note with the configured $EDITOR. Default is true.")
+	PrepNewCmdFlags(newCmd)
 }
