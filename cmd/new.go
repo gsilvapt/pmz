@@ -34,7 +34,7 @@ If a template is specified and you use the --title flag, it will try to insert t
 func newCmdRunFunc(cmd *cobra.Command, args []string) {
 	ztldir := viper.GetString("ztldir")
 	editor := viper.GetString("editor")
-	tmpl_path := viper.GetString("notetemplate")
+	tmplPath := viper.GetString("notetemplate")
 	title, _ := cmd.Flags().GetString("title")
 	toOpen, _ := cmd.Flags().GetBool("open")
 
@@ -46,8 +46,8 @@ func newCmdRunFunc(cmd *cobra.Command, args []string) {
 	f := createFile(ztldir, formattedTs, title)
 	defer f.Close()
 
-	if tmpl_path != "" {
-		writeTmplToNote(f, title, tmpl_path)
+	if tmplPath != "" {
+		writeTmplToNote(f, title, tmplPath)
 	}
 
 	if toOpen {
