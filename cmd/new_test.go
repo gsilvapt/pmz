@@ -13,7 +13,7 @@ import (
 
 func TestNewCmdWithNotOpen(t *testing.T) {
 	// GIVEN a _new_ Cobra CMD sruct with the function newCmdRunFunc in the struct
-	newCommand := &cobra.Command{Use: "new command", Run: newCmdRunFunc}
+	newCommand := &cobra.Command{Use: "new command", Run: newNoteFunc}
 
 	// AND GIVEN a viper config with disabled toOpen and a random ztldir attribute
 	tmpDir := t.TempDir()
@@ -55,7 +55,7 @@ func TestNewCmdWithNotOpen(t *testing.T) {
 
 func TestNewCmdWithTitle(t *testing.T) {
 	// GIVEN a _new_ Cobra CMD sruct with the function newCmdRunFunc in the struct
-	newCommand := &cobra.Command{Use: "new command", Run: newCmdRunFunc}
+	newCommand := &cobra.Command{Use: "new command", Run: newNoteFunc}
 
 	// AND GIVEN a viper config with disabled toOpen and a random ztldir attribute
 	tmpDir := t.TempDir()

@@ -10,21 +10,21 @@ import (
 // InfoLogger can be used to replace all fmt.Println calls.
 // ErrorLogger can be used to call fatal after logging.
 type Log struct {
-	InfoLogger  *log.Logger
-	ErrorLogger *log.Logger
+	infoLogger *log.Logger
+	errorLog   *log.Logger
 }
 
 // InitLogger instantiates three types of logs: An info log, a warn log and an error log.
 func InitLogger() *Log {
 	return &Log{
-		InfoLogger:  log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime),
-		ErrorLogger: log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Llongfile),
+		infoLogger: log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime),
+		errorLog:   log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Llongfile),
 	}
 }
 
 func (l *Log) Info(msg string) {
-	l.InfoLogger.Print(msg)
+	l.infoLogger.Print(msg)
 }
 func (l *Log) Error(msg string) {
-	l.ErrorLogger.Fatalln(msg)
+	l.errorLog.Fatalln(msg)
 }
