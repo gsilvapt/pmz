@@ -22,43 +22,46 @@ var searchCmd = &cobra.Command{
 	Long: `Searches for keywords in all Zettelkasten's notes and files. It integrates Grep and returns its output to 
     the main screen.`,
 	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		ztldir := viper.GetString("ztldir")
-		editor := viper.GetString("editor")
-		term := args[0]
+	Run:  searchCmdFunc,
+}
 
-		// TODO Must make use of the outcome from WalkNoteDir and thus this recursive call should do something.
-		var r []*utils.Result = utils.WalkNoteDir(term, ztldir)
-		if len(r) < 1 {
-			fmt.Println("No results found for query. Exiting...")
-			return
+func searchCmdFunc(cmd *cobra.Command, args []string) {
+	ztldir := viper.GetString("ztldir")
+	editor := viper.GetString("editor")
+	term := args[0]
+
+	// TODO Must make use of the outcome from WalkNoteDir and thus this recursive call should do something.
+	var r []*utils.Result = utils.WalkNoteDir(term, ztldir)
+	if len(r) < 1 {
+		fmt.Println("No results found for query. Exiting...")
+		return
+	}
+
+	for i, f := range r {
+		fmt.Printf("%d | %s: %s", i, f.Path, f.Context)
+	}
+
+	// Proceed with next command
+Interaction:
+	for {
+		fmt.Println("Choose the next action with the found files: `open <id>` to open with your editor, " +
+			"`more <id>` to print the file contents, or <q> to quit.")
+
+		switch cmd, idx := nextCommand(); cmd {
+		case "open":
+			f := r[idx]
+			openFileInEditor(f.Path, editor)
+		case "more":
+			f := r[idx]
+			readFile(f.Path)
+		case "q":
+			fmt.Println("Exiting interface...")
+			break Interaction
+		default:
+			fmt.Println("Unrecognized option: `open <id>` to open with your editor, `more <id>`" +
+				" to print file's contents or <q>  to quit.")
 		}
-
-		for i, f := range r {
-			fmt.Printf("%d | %s: %s", i, f.Path, f.Context)
-		}
-
-		// Proceed with next command
-	Interaction:
-		for {
-			fmt.Println("Choose the next action with the found files: `open <id>` to open with your editor, " +
-				"`more <id>` to print the file contents, or <q> to quit.")
-
-			switch cmd, idx := nextCommand(); cmd {
-			case "open":
-				f := r[idx]
-				OpenFile(f.Path, editor)
-			case "more":
-				f := r[idx]
-				readFile(f.Path)
-			case "q":
-				break Interaction
-			default:
-				fmt.Println("Unrecognized option: `open <id>` to open with your editor, `more <id>`" +
-					" to print file's contents or <q>  to quit.")
-			}
-		}
-	},
+	}
 }
 
 func nextCommand() (string, int) {
