@@ -27,11 +27,11 @@ You will see the new directory and file created in the configured ZTLDIR.
 
 If a template is specified and you use the --title flag, it will try to insert the title in that template.
 `,
-	Run: newCmdRunFunc,
+	Run: newNoteFunc,
 }
 
-// newCmdRunFunc is an isolated func to facilitate writing unit tests to it.
-func newCmdRunFunc(cmd *cobra.Command, args []string) {
+// newNoteFunc is an isolated func to facilitate writing unit tests to it.
+func newNoteFunc(cmd *cobra.Command, args []string) {
 	ztldir := viper.GetString("ztldir")
 	editor := viper.GetString("editor")
 	tmpl_path := viper.GetString("notetemplate")
@@ -51,7 +51,7 @@ func newCmdRunFunc(cmd *cobra.Command, args []string) {
 	}
 
 	if toOpen {
-		OpenFile(f.Name(), editor)
+		openFileInEditor(f.Name(), editor)
 	}
 }
 
@@ -91,7 +91,7 @@ func writeTmplToNote(f *os.File, title, tmplPath string) {
 	}
 
 	if err := tmpl.Execute(f, tmplData); err != nil {
-		Logger.Info("Failed to write template to new note, but the note should exist.")
+		Logger.Error("Failed to write template to new note, but the note should exist.")
 	}
 	return
 }
